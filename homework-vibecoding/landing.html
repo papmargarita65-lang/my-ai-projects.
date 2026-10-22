@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Контент-Мастер AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap&subset=cyrillic" rel="stylesheet">
+<meta name="description" content="Контент-Мастер AI — цифровой помощник, который помогает превращать идеи в контент-планы и промпты для нейросетей.">
+<style>
+  :root {
+    --bg: #17181c;
+    --bg-2: #1e2025;
+    --card: #23252b;
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #f1f2f6;
+    --muted: #a3a7b3;
+    --violet: #8b5cf6;
+    --teal: #2dd4bf;
+    --grad: linear-gradient(135deg, var(--violet), var(--teal));
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Manrope", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    font-size: 1.0625rem; /* 17px */
+    font-weight: 400;
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  button, input { font-family: inherit; }
+  .container { width: min(1080px, 100% - 40px); margin-inline: auto; }
+  section { padding: 96px 0; position: relative; }
+  h1, h2, h3 { line-height: 1.15; font-weight: 700; overflow-wrap: break-word; }
+  h2 { font-size: clamp(1.75rem, 4.5vw, 2.75rem); font-weight: 800; margin-bottom: 18px; letter-spacing: -0.025em; line-height: 1.2; }
+  .lead { color: var(--muted); font-size: 1.125rem; line-height: 1.75; max-width: 680px; }
+  .grad-text {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+
+  /* Кнопки */
+  .btn {
+    display: inline-block;
+    padding: 15px 34px;
+    border-radius: 999px;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    line-height: 1.4;
+    color: #fff;
+    text-decoration: none;
+    background: var(--grad);
+    border: 0;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(45, 212, 191, 0.35); filter: brightness(1.08); }
+  .btn:active { transform: translateY(0); }
+  .btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+
+  /* Первый экран */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before, .hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.45;
+    z-index: 0;
+    animation: float 12s ease-in-out infinite;
+  }
+  .hero::before { width: 460px; height: 460px; background: var(--violet); top: -120px; left: -120px; }
+  .hero::after { width: 420px; height: 420px; background: var(--teal); bottom: -140px; right: -100px; animation-delay: -6s; }
+  .hero .container { position: relative; z-index: 1; }
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 8.5vw, 5.4rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    margin-bottom: 24px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: clamp(1.0625rem, 2.4vw, 1.3rem);
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 0 auto 40px;
+  }
+
+  /* Проблема */
+  .problem { background: var(--bg-2); }
+  .problem-list { margin-top: 36px; display: grid; gap: 14px; max-width: 720px; }
+  .problem-list li {
+    list-style: none;
+    padding: 18px 20px 18px 52px;
+    line-height: 1.65;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    position: relative;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  .problem-list li::before {
+    content: "";
+    position: absolute;
+    left: 20px; top: 50%;
+    width: 14px; height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: var(--grad);
+  }
+  .problem-list li:hover { transform: translateX(6px); border-color: rgba(139, 92, 246, 0.5); }
+  .problem .summary { margin-top: 28px; color: var(--text); max-width: 720px; }
+
+  /* Карточки */
+  .cards { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 32px 28px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(45, 212, 191, 0.5);
+    box-shadow: 0 20px 45px rgba(139, 92, 246, 0.2);
+  }
+  .icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: var(--grad);
+    display: grid; place-items: center;
+    margin-bottom: 22px;
+    transition: transform 0.3s ease;
+  }
+  .card:hover .icon { transform: rotate(-6deg) scale(1.08); }
+  .icon svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .card h3 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; margin-bottom: 12px; }
+  .card p { color: var(--muted); font-size: 1.0625rem; line-height: 1.7; }
+
+  /* Шаги */
+  .how { background: var(--bg-2); }
+  .steps { margin-top: 48px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; counter-reset: step; }
+  .step {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 32px 28px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .step:hover { transform: translateY(-6px); border-color: rgba(139, 92, 246, 0.5); }
+  .step .num {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 14px;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .step h3 { font-size: 1.35rem; letter-spacing: -0.015em; margin-bottom: 10px; }
+  .step p { color: var(--muted); font-size: 1.0625rem; line-height: 1.7; }
+  .step:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 18px; text-align: center;
+    color: var(--teal);
+    font-size: 1.4rem;
+  }
+
+  /* Для кого */
+  .audience-grid { margin-top: 44px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .aud {
+    display: flex; align-items: center; gap: 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 22px 24px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .aud:hover { transform: translateY(-4px); border-color: rgba(45, 212, 191, 0.5); }
+  .aud .icon { margin: 0; flex: none; width: 48px; height: 48px; border-radius: 14px; }
+  .aud .icon svg { width: 24px; height: 24px; }
+  .aud span { font-weight: 600; line-height: 1.5; }
+
+  /* Призыв */
+  .cta { text-align: center; overflow: hidden; }
+  .cta .box {
+    position: relative;
+    padding: 72px 28px;
+    border-radius: 32px;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(600px 300px at 15% 0%, rgba(139, 92, 246, 0.28), transparent 70%),
+      radial-gradient(600px 300px at 85% 100%, rgba(45, 212, 191, 0.24), transparent 70%),
+      var(--card);
+  }
+  .cta h2 { margin-bottom: 16px; }
+  .cta p { color: var(--muted); font-size: 1.125rem; max-width: 560px; margin: 0 auto 34px; }
+
+  footer { padding: 28px 0 40px; text-align: center; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+  /* Анимации */
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(40px, 30px); }
+  }
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero::before, .hero::after { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    * { transition-duration: 0.01ms !important; }
+  }
+
+  /* Адаптация */
+  @media (max-width: 860px) {
+    section { padding: 72px 0; }
+    .cards, .steps { grid-template-columns: 1fr; }
+    .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -22px; transform: translateX(-50%); }
+    .audience-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .container { width: calc(100% - 32px); }
+    body { font-size: 1rem; }
+    .lead, .cta p { font-size: 1.0625rem; }
+    .card p, .step p { font-size: 1rem; }
+    .btn { width: 100%; text-align: center; }
+    .hero { min-height: 92vh; }
+    .cta .box { padding: 52px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge">Учебный проект</span>
+    <h1><span class="grad-text">Контент-Мастер AI</span></h1>
+    <p>Цифровой помощник, который помогает превращать идеи в контент-планы и промпты для нейросетей.</p>
+    <a class="btn" href="#problem" id="learn-more">Узнать больше</a>
+  </div>
+</header>
+
+<main>
+  <section class="problem" id="problem">
+    <div class="container reveal">
+      <span class="eyebrow">Проблема</span>
+      <h2>Какую проблему мы решаем</h2>
+      <p class="lead">Работать с нейросетями непросто, особенно в начале пути. Трудности возникают на каждом этапе:</p>
+      <ul class="problem-list">
+        <li>Сложно выбрать подходящую нейросеть среди множества сервисов.</li>
+        <li>Трудно составить эффективный промпт, который даёт нужный результат.</li>
+        <li>Процесс создания контента не организован: идеи, задачи и тексты разбросаны по разным местам.</li>
+      </ul>
+      <p class="summary lead">Контент-Мастер AI помогает структурировать работу и двигаться от идеи к результату.</p>
+    </div>
+  </section>
+
+  <section id="benefits">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Преимущества</span>
+        <h2>Что даёт Контент-Мастер AI</h2>
+      </div>
+      <div class="cards">
+        <article class="card reveal">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 15l2.5 2.5L16 13"/></svg>
+          </div>
+          <h3>Планирование контента</h3>
+          <p>Превращайте разрозненные идеи в понятный контент-план, чтобы всегда знать, что делать дальше.</p>
+        </article>
+        <article class="card reveal">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>
+          </div>
+          <h3>Создание промптов для нейросетей</h3>
+          <p>Помощь в формулировке запросов, которые понятны нейросетям и подходят под вашу задачу.</p>
+        </article>
+        <article class="card reveal">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity="0.6"/></svg>
+          </div>
+          <h3>Единая система работы с контентом</h3>
+          <p>Идеи, промпты и планы собраны в одном месте, а процесс стал последовательным и прозрачным.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Процесс</span>
+        <h2>Как это работает</h2>
+        <p class="lead">Три простых шага от замысла до готового материала.</p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="num">01</div>
+          <h3>Идея</h3>
+          <p>Вы описываете, о чём хотите рассказать и какая у вас цель.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">02</div>
+          <h3>Промпт</h3>
+          <p>Идея превращается в чёткий промпт для подходящей нейросети.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">03</div>
+          <h3>Контент</h3>
+          <p>По промпту вы получаете материал и встраиваете его в контент-план.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="audience">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">Аудитория</span>
+        <h2>Для кого подходит</h2>
+      </div>
+      <div class="audience-grid">
+        <div class="aud reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+          <span>Начинающие пользователи искусственного интеллекта</span>
+        </div>
+        <div class="aud reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/></svg></div>
+          <span>Блогеры и авторы коротких видео</span>
+        </div>
+        <div class="aud reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></div>
+          <span>SMM-специалисты и копирайтеры</span>
+        </div>
+        <div class="aud reveal">
+          <div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V5a1 1 0 011-1h4a1 1 0 011 1v3M3 13h18"/></svg></div>
+          <span>Самозанятые специалисты и владельцы небольших проектов</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" id="contact">
+    <div class="container">
+      <div class="box reveal">
+        <h2>Готовы превратить идеи <span class="grad-text">в контент?</span></h2>
+        <p>Напишите мне в Telegram — обсудим проект и ваши вопросы.</p>
+        <a class="btn" href="https://t.me/Margaritka65" target="_blank" rel="noopener noreferrer">Связаться со мной</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">Контент-Мастер AI — учебный проект</div>
+</footer>
+
+<script>
+  // Кнопка «Узнать больше»: плавная прокрутка к описанию
+  document.getElementById('learn-more').addEventListener('click', function (e) {
+    var target = document.getElementById('problem');
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // Плавное появление блоков при прокрутке
+  var items = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    items.forEach(function (el, i) {
+      el.style.transitionDelay = (i % 3) * 0.1 + 's';
+      io.observe(el);
+    });
+  } else {
+    items.forEach(function (el) { el.classList.add('visible'); });
+  }
+</script>
+</body>
+</html>
